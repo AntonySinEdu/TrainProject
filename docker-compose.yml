@@ -1,0 +1,29 @@
+version: '2.11.2'
+
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_USER=openmeetings
+      - MYSQL_PASSWORD=openmeetings
+      - MYSQL_DATABASE=om
+    volumes:
+      - ./OM_DB/mysql:/var/lib/mysql/data
+    restart: always
+
+  openmeetings:
+     image: apache/openmeetings:7.2.0
+     ports:
+       - 5443:5443
+     volumes:
+       - ./OM_DB/omdata:/opt/omdata
+     environment:
+       - OM_DB_TYPE=MySql
+       - OM_DB_HOST=mariadb
+       - OM_DB_USER=openmeetings
+       - OM_DB_PASS=openmeetings
+       - OM_DB_NAME=om
+     depends_on:
+       - mariadb
+     restart: always
