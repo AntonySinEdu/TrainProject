@@ -8,18 +8,16 @@ services:
       - MYSQL_USER=openmeetings
       - MYSQL_PASSWORD=openmeetings
       - MYSQL_DATABASE=om
-    networks:
-      - dockervlan
     volumes:
       - ./OM_DB/mysql:/var/lib/mysql/data
     restart: always
 
   openmeetings:
      image: apache/openmeetings:7.2.0
+     ports:
+       - 5443:5443
      volumes:
        - ./OM_DB/omdata:/opt/omdata
-     networks:
-       - dockervlan
      environment:
        - OM_DB_TYPE=MySql
        - OM_DB_HOST=mariadb
@@ -29,15 +27,3 @@ services:
      depends_on:
        - mariadb
      restart: always
-networks:
-  dockervlan:
-    name: dockervlan
-    driver: macvlan
-    driver_opts:
-      parent: enp0s3
-    ipam:
-      config:
-        - subnet: "10.0.2.0/24"
-          gateway: "10.0.2.2"
-          aux_addresses:
-            host1: 10.0.2.1
